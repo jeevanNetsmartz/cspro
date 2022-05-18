@@ -1,0 +1,76 @@
+<div class="container-fluid">
+  <div class="row flex-nowrap">
+    <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+      <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+        <div class="flex justify-content-between px-2 py-3">
+          <div>
+            <div class="mb-2 text-gray-700 text-sm">All Workflows</div>
+            <div class="text-900">CREATE NEW MODELBASED TESTCASE</div>
+          </div>
+          <p-splitButton label="Manage Workflow" [model]="this.items" styleClass="p-button-lg mr-2 mb-2">
+          </p-splitButton>
+        </div>
+
+        <div class="d-grid gap-2 col-12 mx-auto">
+          <button (click)="drawModeOn()" class="btn btn-primary">Draw Mode On</button>
+          <button (click)="drawModeOff()" class="btn btn-primary">Draw Mode Off</button>
+          <button (click)="deleteEdge()" class="btn btn-danger">Delete Edge</button>
+          <button (click)="deleteNode()" class="btn btn-danger">Delete Node</button>
+        </div>
+
+        <div class="d-grid gap-2 col-12 mx-auto mt-5">
+          <input type="text" class="form-control" [(ngModel)]="edgeName" placeholder="Edge Name"
+            (ngModelChange)="ontextChangeEdge()">
+          <input type="text" class="form-control" [(ngModel)]="nodeName" placeholder="Node Name"
+            (ngModelChange)="ontextChange()">
+        </div>
+        <div class="d-grid gap-2 col-12 mx-auto mt-5">
+          <button (click)="getData()" class="btn btn-primary">Get Graph Data</button>
+        </div>
+      </div>
+    </div>
+    <div class="col py-3">
+
+      <p-contextMenu [target]="graph" [model]="items"></p-contextMenu>
+      <div #graph>
+        <div class="flex border-0">
+          <div class="w-3rem"></div>
+          <div class="w-10">
+
+            <div id="cy"></div>
+          </div>
+          <div class="w-2">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div #graph style="display: flex;"> -->
+
+
+<!-- <div #biggraph></div> -->
+<!-- <cytoscape-graph #biggraph title="TGF-beta-Receptor"
+                     class="medium-graph"
+                     [debug]=false
+                     [showToolbar]=true
+                     [nodes]="bigGraphNodes"
+                     [edges]="bigGraphEdges"
+                     [style]="bigGraphStylesheet"
+                     
+                    >
+    </cytoscape-graph> -->
+
+<!-- <cytoscape-graph-toolbar [(layoutOptions)]="bigGraphLayoutOptions"
+    [(styles)]="bigGraphStylesheet"
+    [showToolbarButtons]="true"
+    (layoutOptionsChange)="bigGraphLayoutToolbarChange($event)"
+    (stylesChange)="bigGraphLayoutStylesToolbarChange($event)"
+    (styleSelectorChange)="bigGraphLayoutStylesSelectorChange($event)"
+    [nodes]="bigGraphNodes"
+    [edges]="bigGraphEdges"
+    direction="column"
+></cytoscape-graph-toolbar> -->
+
+<!-- </div> -->

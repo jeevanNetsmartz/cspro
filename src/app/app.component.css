@@ -1,0 +1,20 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+.medium-graph {
+    width: 600px;
+    height: 600px;
+    border: 1px solid #4d7a0d;
+}
+#cy {
+    height: 100vh;
+}
+#cy canvas {
+    width: 100vw;
+}
+#cy canvas .node {
+    padding: 100px;
+}
