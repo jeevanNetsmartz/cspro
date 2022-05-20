@@ -14,15 +14,21 @@
         <div class="d-grid gap-2 col-12 mx-auto">
           <button (click)="drawModeOn()" class="btn btn-primary">Draw Mode On</button>
           <button (click)="drawModeOff()" class="btn btn-primary">Draw Mode Off</button>
-          <button (click)="deleteEdge()" class="btn btn-danger">Delete Edge</button>
-          <button (click)="deleteNode()" class="btn btn-danger">Delete Node</button>
+          <!-- <button (click)="deleteEdge()" class="btn btn-danger">Delete Edge</button>
+          <button (click)="deleteNode()" class="btn btn-danger">Delete Node</button> -->
         </div>
 
         <div class="d-grid gap-2 col-12 mx-auto mt-5">
-          <input type="text" class="form-control" [(ngModel)]="edgeName" placeholder="Edge Name"
-            (ngModelChange)="ontextChangeEdge()">
-          <input type="text" class="form-control" [(ngModel)]="nodeName" placeholder="Node Name"
-            (ngModelChange)="ontextChange()">
+          <label>Node</label>
+          <input type="text" class="form-control" [(ngModel)]="nodeName" placeholder="Node Name" (ngModelChange)="ontextChange()">
+          <input type="text" class="form-control" [(ngModel)]="nodeAction" placeholder="Node Action" (ngModelChange)="ontextChangeActionNode()">
+        </div>
+
+        <div class="d-grid gap-2 col-12 mx-auto mt-5">
+          <!-- <input type="text" class="form-control" [(ngModel)]="eleAction" placeholder="Action" (ngModelChange)="ontextChangeAction()"> -->
+          <label>Edge</label>
+          <input type="text" class="form-control" [(ngModel)]="edgeName" placeholder="Edge Name" (ngModelChange)="ontextChangeEdge()">
+          <input type="text" class="form-control" [(ngModel)]="edgeAction" placeholder="Edge Action" (ngModelChange)="ontextChangeActionEdge()">
         </div>
         <div class="d-grid gap-2 col-12 mx-auto mt-5">
           <button (click)="getData()" class="btn btn-primary">Get Graph Data</button>
@@ -36,7 +42,7 @@
         <div class="flex border-0">
           <div class="w-3rem"></div>
           <div class="w-10">
-
+            <div class="drawMode">Draw Mode is: {{ drawMode }}</div>
             <div id="cy"></div>
           </div>
           <div class="w-2">

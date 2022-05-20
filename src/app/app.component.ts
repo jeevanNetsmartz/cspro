@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, HostListener, ViewChild } from '@angular/core';
 import cytoscape, { EdgeDefinition, LayoutOptions, NodeDefinition, Stylesheet } from 'cytoscape';
 import { CoseLayoutOptionsImpl, CytoscapeGraphComponent } from 'cytoscape-angular';
 import { MenuItem } from 'primeng/api';
@@ -28,14 +28,19 @@ export class AppComponent {
   rightClickY = 0;
   nodeName: string = '';
   selectedNode: string = '';
+  nodeAction: string = '';
 
   edgeName: string = '';
   selectedEdge: string = '';
+  edgeAction: string = '';
 
+  selectedDeleteElement: string = '';
+  drawMode: string = '';
+  
   nodeElements = [
-    { data: { id: 'a', label: 'a', name: 'a' } },
-    { data: { id: 'b', label: 'b', name: 'b' } },
-    { data: { id: 'ab', source: 'a', target: 'b'}}
+    { data: { id: 'a', label: 'a', name: 'a', action: '' } },
+    { data: { id: 'b', label: 'b', name: 'b', action: '' } },
+    { data: { id: 'ab', source: 'a', target: 'b', action: '' } }
   ]
 
   ngOnInit(): void {
@@ -245,6 +250,7 @@ export class AppComponent {
             id: event.originalEvent.clientX,
             label: vertexName,
             name: vertexName,
+            action: '',
             color: 'red'
           }
           this.nodeElements.push({ data: newNode1 })
@@ -263,7 +269,8 @@ export class AppComponent {
             id: `e-${vertexName}`,
             source: event.originalEvent.clientX,
             name: vertexName,
-            target: this.selectedNode || 'a'
+            target: this.selectedNode || 'a',
+            action: ''
           }
 
           this.cy.add({
@@ -276,7 +283,9 @@ export class AppComponent {
           //event.item: menuitem metadata
         }
       },
-      { label: 'Delete', icon: 'pi pi-fw pi-times' }
+      { label: 'Delete', icon: 'pi pi-fw pi-times' },
+      { label: 'Delete Node', icon: 'pi pi-fw pi-times', command: (event?: any) => this.deleteNode() },
+      { label: 'Delete Edge', icon: 'pi pi-fw pi-times', command: (event?: any) => this.deleteEdge() }
     ];
 
 
@@ -295,6 +304,7 @@ export class AppComponent {
     });
 
     this.eh.disableDrawMode();
+    this.drawMode = 'Off'
 
   }
 
@@ -348,16 +358,20 @@ export class AppComponent {
     var node = e.target;
     var nodeData = node.json();
     this.nodeName = nodeData.data.name
+    this.nodeAction = nodeData.data.action
     this.selectedNode = nodeData.data.id
+    this.selectedEdge = '';
   }
 
 
   onEdgeClicked(e: any) {
     var edge = e.target;
     var edgeData = edge.json();
-    this.selectedEdge = edgeData.data.id
     let data = this.cy.$('#' + this.selectedEdge).css();
     this.edgeName = data['content'] || ''
+    this.edgeAction = edgeData.data.action
+    this.selectedEdge = edgeData.data.id
+    this.selectedNode = '';
   }
 
   ontextChange() {
@@ -376,22 +390,36 @@ export class AppComponent {
     });
   }
 
+  ontextChangeActionNode() {
+    var j = this.cy.$('#' + this.selectedNode);
+    j.data('action', this.nodeAction);
+  }
+
+  ontextChangeActionEdge() {
+    var j = this.cy.$('#' + this.selectedEdge);
+    j.data('action', this.edgeAction);
+  }
+
   getData() {
     let graphData: any = this.cy.json()
     console.log(graphData['elements'])
   }
 
   drawModeOn() {
+    this.drawMode = 'On'
     this.eh.enableDrawMode();
   }
 
   drawModeOff() {
+    this.drawMode = 'Off'
     this.eh.disableDrawMode();
   }
 
   deleteEdge() {
     if (this.selectedEdge) {
       this.cy.remove('#' + this.selectedEdge);
+    } else {
+      alert("Please select a edge")
     }
   }
 
@@ -400,6 +428,18 @@ export class AppComponent {
       this.cy.remove('edge[source=\'' + this.selectedNode + '\']');
       this.cy.remove('edge[target=\'' + this.selectedNode + '\']');
       this.cy.remove('#' + this.selectedNode);
+    } else {
+      alert("Please select a node")
     }
+  }
+
+
+  @HostListener('window:keydown.shift', ['$event'])
+  onKeyPress($event: KeyboardEvent) {
+    this.drawModeOn()
+  }
+  @HostListener('window:keydown.control', ['$event'])
+  onKeyUp($event: KeyboardEvent) {
+    this.drawModeOff()
   }
 }
