@@ -3,6 +3,7 @@ import cytoscape, { EdgeDefinition, LayoutOptions, NodeDefinition, Stylesheet } 
 import { CoseLayoutOptionsImpl, CytoscapeGraphComponent } from 'cytoscape-angular';
 import { MenuItem } from 'primeng/api';
 import edgehandles from 'cytoscape-edgehandles';
+import { delay } from 'rxjs';
 
 cytoscape.use(edgehandles);
 @Component({
@@ -29,18 +30,22 @@ export class AppComponent {
   nodeName: string = '';
   selectedNode: string = '';
   nodeAction: string = '';
+  nodeGuard: string = '';
+  showNodeSection: boolean = false;
 
   edgeName: string = '';
   selectedEdge: string = '';
   edgeAction: string = '';
+  edgeGuard: string = '';
+  showEdgeSection: boolean = false;
 
   selectedDeleteElement: string = '';
   drawMode: string = '';
-  
+
   nodeElements = [
-    { data: { id: 'a', label: 'a', name: 'a', action: '' } },
-    { data: { id: 'b', label: 'b', name: 'b', action: '' } },
-    { data: { id: 'ab', source: 'a', target: 'b', action: '' } }
+    { data: { id: 'a', label: 'a', name: 'a', action: '', guard: '' } },
+    { data: { id: 'b', label: 'b', name: 'b', action: '', guard: '' } },
+    { data: { id: 'ab', source: 'a', target: 'b', action: '', guard: '' } }
   ]
 
   ngOnInit(): void {
@@ -173,12 +178,24 @@ export class AppComponent {
     });
     this.cy.resize();
 
-    this.cy.on('tapstart', 'node', (event: any) => {
-      this.onNodeClicked(event)
+    let cySec = this.cy;
+    cySec.on('tap', (event) => {
+      if( event.target === cySec ){
+        this.showNodeSection = false;
+        this.showEdgeSection = false;
+      }
     });
 
-
+    this.cy.on('tapstart', 'node', (event: any) => {
+      this.showNodeSection = true;
+      this.showEdgeSection = false;
+      this.onNodeClicked(event)
+    });
+    
+    
     this.cy.on('tapstart', 'edge', (event: any) => {
+      this.showEdgeSection = true;
+      this.showNodeSection = false;
       this.onEdgeClicked(event)
     });
 
@@ -251,6 +268,7 @@ export class AppComponent {
             label: vertexName,
             name: vertexName,
             action: '',
+            guard: '',
             color: 'red'
           }
           this.nodeElements.push({ data: newNode1 })
@@ -270,7 +288,8 @@ export class AppComponent {
             source: event.originalEvent.clientX,
             name: vertexName,
             target: this.selectedNode || 'a',
-            action: ''
+            action: '',
+            guard: ''
           }
 
           this.cy.add({
@@ -367,10 +386,10 @@ export class AppComponent {
   onEdgeClicked(e: any) {
     var edge = e.target;
     var edgeData = edge.json();
+    this.selectedEdge = edgeData.data.id
     let data = this.cy.$('#' + this.selectedEdge).css();
     this.edgeName = data['content'] || ''
     this.edgeAction = edgeData.data.action
-    this.selectedEdge = edgeData.data.id
     this.selectedNode = '';
   }
 
@@ -398,6 +417,16 @@ export class AppComponent {
   ontextChangeActionEdge() {
     var j = this.cy.$('#' + this.selectedEdge);
     j.data('action', this.edgeAction);
+  }
+
+  ontextChangeGuardNode() {
+    var j = this.cy.$('#' + this.selectedNode);
+    j.data('guard', this.nodeGuard);
+  }
+
+  ontextChangeGuardEdge() {
+    var j = this.cy.$('#' + this.selectedEdge);
+    j.data('guard', this.edgeGuard);
   }
 
   getData() {
@@ -433,12 +462,68 @@ export class AppComponent {
     }
   }
 
+  play() {
+    // this.cy.nodes().animate({
+    //   style: { 'background-color': 'blue' }
+    // }, {
+    //   duration: 1000
+    // }).delay( 1000 )
+    // .animate({
+    //   style: { 'background-color': 'yellow' }
+    // });
+    let cySec = this.cy;
+
+    cySec.nodes().forEach(function (ele,i) {
+      cySec.$('#' + ele.id()).css({
+        backgroundColor: 'white'
+      });
+    });
+
+    cySec.nodes().forEach(function (ele,i) {
+      setTimeout(function(){
+        let nodeId = ele.id()
+        cySec.$('#' + nodeId).css({
+          backgroundColor: 'green'
+        });
+        var j = cySec.$('#'+nodeId);
+        var edge = j.connectedEdges();
+        if(ele.id() === edge[0].target().id()) {
+          cySec.$('#' + edge[0].id()).css({
+            "target-arrow-color": "rgb(0,0,255)",
+            "line-color": "rgb(0,0,255)",
+            "source-arrow-color": "rgb(0,0,255)",
+          });
+        }
+        // console.log('Node source ', ele.id(), edge[0].source().id(), edge[0].id());
+        // console.log('Node target ', ele.id(), edge[0].target().id(), edge[0].id());
+      }, i * 1000);
+     
+    });
+
+    // this.cy.nodes().animate({
+    //   style: { backgroundColor: 'red' }
+    // }, {
+    //   duration: 1000
+    // });
+
+  }
+
+  stop() {
+    let cySec = this.cy;
+
+    cySec.nodes().forEach(function (ele,i) {
+      cySec.$('#' + ele.id()).css({
+        backgroundColor: 'white'
+      });
+    });
+  }
+
 
   @HostListener('window:keydown.shift', ['$event'])
   onKeyPress($event: KeyboardEvent) {
     this.drawModeOn()
   }
-  @HostListener('window:keydown.control', ['$event'])
+  @HostListener('window:keydown.shift', ['$event'])
   onKeyUp($event: KeyboardEvent) {
     this.drawModeOff()
   }

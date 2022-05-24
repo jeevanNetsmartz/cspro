@@ -18,21 +18,29 @@
           <button (click)="deleteNode()" class="btn btn-danger">Delete Node</button> -->
         </div>
 
-        <div class="d-grid gap-2 col-12 mx-auto mt-5">
+        <div class="d-grid gap-2 col-12 mx-auto mt-5" *ngIf="showNodeSection" >
           <label>Node</label>
           <input type="text" class="form-control" [(ngModel)]="nodeName" placeholder="Node Name" (ngModelChange)="ontextChange()">
           <input type="text" class="form-control" [(ngModel)]="nodeAction" placeholder="Node Action" (ngModelChange)="ontextChangeActionNode()">
+          <!-- <input type="text" class="form-control" [(ngModel)]="nodeGuard" placeholder="Node Guard" (ngModelChange)="ontextChangeGuardNode()"> -->
         </div>
 
-        <div class="d-grid gap-2 col-12 mx-auto mt-5">
+        <div class="d-grid gap-2 col-12 mx-auto mt-5" *ngIf="showEdgeSection" >
           <!-- <input type="text" class="form-control" [(ngModel)]="eleAction" placeholder="Action" (ngModelChange)="ontextChangeAction()"> -->
           <label>Edge</label>
           <input type="text" class="form-control" [(ngModel)]="edgeName" placeholder="Edge Name" (ngModelChange)="ontextChangeEdge()">
           <input type="text" class="form-control" [(ngModel)]="edgeAction" placeholder="Edge Action" (ngModelChange)="ontextChangeActionEdge()">
+          <input type="text" class="form-control" [(ngModel)]="edgeGuard" placeholder="Edge Guard" (ngModelChange)="ontextChangeGuardEdge()">
         </div>
         <div class="d-grid gap-2 col-12 mx-auto mt-5">
-          <button (click)="getData()" class="btn btn-primary">Get Graph Data</button>
+          <button (click)="getData()" class="btn btn-primary">Export Graph Data</button>
         </div>
+
+        <div class="d-grid gap-2 col-12 mx-auto mt-5">
+          <button (click)="play()" class="btn btn-primary">Play</button>
+          <button (click)="stop()" class="btn btn-primary">Stop</button>
+        </div>
+
       </div>
     </div>
     <div class="col py-3">
