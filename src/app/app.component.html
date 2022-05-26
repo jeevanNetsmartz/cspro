@@ -12,8 +12,8 @@
         </div>
 
         <div class="d-grid gap-2 col-12 mx-auto">
-          <button (click)="drawModeOn()" class="btn btn-primary">Draw Mode On</button>
-          <button (click)="drawModeOff()" class="btn btn-primary">Draw Mode Off</button>
+          <!-- <button (click)="drawModeOn()" class="btn btn-primary">Draw Mode On</button>
+          <button (click)="drawModeOff()" class="btn btn-primary">Draw Mode Off</button> -->
           <!-- <button (click)="deleteEdge()" class="btn btn-danger">Delete Edge</button>
           <button (click)="deleteNode()" class="btn btn-danger">Delete Node</button> -->
         </div>
@@ -21,7 +21,9 @@
         <div class="d-grid gap-2 col-12 mx-auto mt-5" *ngIf="showNodeSection" >
           <label>Node</label>
           <input type="text" class="form-control" [(ngModel)]="nodeName" placeholder="Node Name" (ngModelChange)="ontextChange()">
-          <input type="text" class="form-control" [(ngModel)]="nodeAction" placeholder="Node Action" (ngModelChange)="ontextChangeActionNode()">
+          <input type="text" class="form-control" [(ngModel)]="nodeWeight" placeholder="Node Weight" (ngModelChange)="ontextChangeWeightNode()">
+          <textarea class="form-control" [(ngModel)]="nodeAction" placeholder="Node Action" (ngModelChange)="ontextChangeActionNode()"></textarea>
+          <textarea class="form-control" [(ngModel)]="nodeRequirements" placeholder="Node Requirement" (ngModelChange)="ontextChangeRequirementNode()"></textarea>
           <!-- <input type="text" class="form-control" [(ngModel)]="nodeGuard" placeholder="Node Guard" (ngModelChange)="ontextChangeGuardNode()"> -->
         </div>
 
@@ -29,8 +31,10 @@
           <!-- <input type="text" class="form-control" [(ngModel)]="eleAction" placeholder="Action" (ngModelChange)="ontextChangeAction()"> -->
           <label>Edge</label>
           <input type="text" class="form-control" [(ngModel)]="edgeName" placeholder="Edge Name" (ngModelChange)="ontextChangeEdge()">
-          <input type="text" class="form-control" [(ngModel)]="edgeAction" placeholder="Edge Action" (ngModelChange)="ontextChangeActionEdge()">
-          <input type="text" class="form-control" [(ngModel)]="edgeGuard" placeholder="Edge Guard" (ngModelChange)="ontextChangeGuardEdge()">
+          <input type="text" class="form-control" [(ngModel)]="edgeWeight" placeholder="Edge Weight" (ngModelChange)="ontextChangeWeightEdge()">
+          <textarea class="form-control" [(ngModel)]="edgeAction" placeholder="Edge Action" (ngModelChange)="ontextChangeActionEdge()"></textarea>
+          <textarea class="form-control" [(ngModel)]="edgeGuard" placeholder="Edge Guard" (ngModelChange)="ontextChangeGuardEdge()"></textarea>
+          <textarea class="form-control" [(ngModel)]="edgeRequirements" placeholder="Edge Requirement" (ngModelChange)="ontextChangeRequirementEdge()"></textarea>
         </div>
         <div class="d-grid gap-2 col-12 mx-auto mt-5">
           <button (click)="getData()" class="btn btn-primary">Export Graph Data</button>
@@ -43,7 +47,7 @@
 
       </div>
     </div>
-    <div class="col py-3">
+    <div class="col py-3 textPosition">
 
       <p-contextMenu [target]="graph" [model]="items"></p-contextMenu>
       <div #graph>
@@ -59,6 +63,11 @@
       </div>
     </div>
   </div>
+</div>
+
+<div id="tooltipArea">
+  <input type="text" *ngIf="showNodeSection"  class="form-control" [(ngModel)]="nodeName" placeholder="Node Name" (ngModelChange)="ontextChange()">
+  <input type="text" *ngIf="showEdgeSection"  class="form-control" [(ngModel)]="edgeName" placeholder="Edge Name" (ngModelChange)="ontextChangeEdge()">
 </div>
 
 <!-- <div #graph style="display: flex;"> -->

@@ -26,3 +26,28 @@
     left: 0;
     top: 0;
 }
+#tooltipArea{
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 250px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgb(0 0 0 / 25%);
+    z-index: 99;
+    display: none;
+}
+#tooltipArea::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: rgb(132,132,132) transparent transparent transparent;
+}
+#tooltipArea input {
+    margin-bottom: 10px;
+}

@@ -1,4 +1,4 @@
-import { Component, HostListener, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import cytoscape, { EdgeDefinition, LayoutOptions, NodeDefinition, Stylesheet } from 'cytoscape';
 import { CoseLayoutOptionsImpl, CytoscapeGraphComponent } from 'cytoscape-angular';
 import { MenuItem } from 'primeng/api';
@@ -11,7 +11,7 @@ cytoscape.use(edgehandles);
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   bigGraphNodes: NodeDefinition[] = []
   bigGraphEdges: EdgeDefinition[] = []
   bigGraphStylesheet: Stylesheet[] = []
@@ -31,21 +31,25 @@ export class AppComponent {
   selectedNode: string = '';
   nodeAction: string = '';
   nodeGuard: string = '';
+  nodeRequirements: string = '';
+  nodeWeight: string = '';
   showNodeSection: boolean = false;
 
   edgeName: string = '';
   selectedEdge: string = '';
   edgeAction: string = '';
   edgeGuard: string = '';
+  edgeRequirements: string = '';
+  edgeWeight: string = '';
   showEdgeSection: boolean = false;
 
   selectedDeleteElement: string = '';
   drawMode: string = '';
 
   nodeElements = [
-    { data: { id: 'a', label: 'a', name: 'a', action: '', guard: '' } },
-    { data: { id: 'b', label: 'b', name: 'b', action: '', guard: '' } },
-    { data: { id: 'ab', source: 'a', target: 'b', action: '', guard: '' } }
+    { data: { id: 'a', label: 'a', name: 'a', action: '', requirement: '', weight: '' } },
+    { data: { id: 'b', label: 'b', name: 'b', action: '', requirement: '', weight: '' } },
+    { data: { id: 'ab', source: 'a', target: 'b', action: '', guard: '', requirement: '', weight: '' } }
   ]
 
   ngOnInit(): void {
@@ -184,12 +188,27 @@ export class AppComponent {
         this.showNodeSection = false;
         this.showEdgeSection = false;
       }
+      var inputSec:any = document.getElementById('tooltipArea');
+      inputSec.style.display = 'none'
     });
 
     this.cy.on('tapstart', 'node', (event: any) => {
       this.showNodeSection = true;
       this.showEdgeSection = false;
       this.onNodeClicked(event)
+    });
+
+
+    this.cy.on('dbltap', 'node', (event: any) => {
+      this.showNodeSection = true;
+      this.showEdgeSection = false;
+      this.addInput(event.renderedPosition.x, event.renderedPosition.y)
+    });
+
+    this.cy.on('dbltap', 'edge', (event: any) => {
+      this.showNodeSection = false;
+      this.showEdgeSection = true;
+      this.addInput(event.renderedPosition.x, event.renderedPosition.y)
     });
     
     
@@ -268,7 +287,8 @@ export class AppComponent {
             label: vertexName,
             name: vertexName,
             action: '',
-            guard: '',
+            requirement: '',
+            weight: '',
             color: 'red'
           }
           this.nodeElements.push({ data: newNode1 })
@@ -283,19 +303,21 @@ export class AppComponent {
               }
             })
 
-          var newEdge = {
-            id: `e-${vertexName}`,
-            source: event.originalEvent.clientX,
-            name: vertexName,
-            target: this.selectedNode || 'a',
-            action: '',
-            guard: ''
-          }
+          // var newEdge = {
+          //   id: `e-${vertexName}`,
+          //   source: event.originalEvent.clientX,
+          //   name: vertexName,
+          //   target: this.selectedNode || 'a',
+          //   action: '',
+          //   weight: '',
+          //   requirement: '',
+          //   guard: ''
+          // }
 
-          this.cy.add({
-            group: 'edges',
-            data: newEdge
-          })
+          // this.cy.add({
+          //   group: 'edges',
+          //   data: newEdge
+          // })
           // console.log(`app gets big layout toolbar change ${JSON.stringify($event)}`)
           // this.bigGraph?.render()
 
@@ -325,9 +347,6 @@ export class AppComponent {
     this.eh.disableDrawMode();
     this.drawMode = 'Off'
 
-  }
-
-  ngAfterViewInit(): void {
   }
 
   bigGraphLayoutToolbarChange($event: any): void {
@@ -378,6 +397,8 @@ export class AppComponent {
     var nodeData = node.json();
     this.nodeName = nodeData.data.name
     this.nodeAction = nodeData.data.action
+    this.nodeRequirements = nodeData.data.requirement
+    this.nodeWeight = nodeData.data.weight
     this.selectedNode = nodeData.data.id
     this.selectedEdge = '';
   }
@@ -390,6 +411,8 @@ export class AppComponent {
     let data = this.cy.$('#' + this.selectedEdge).css();
     this.edgeName = data['content'] || ''
     this.edgeAction = edgeData.data.action
+    this.edgeRequirements = edgeData.data.requirement
+    this.edgeWeight = edgeData.data.weight
     this.selectedNode = '';
   }
 
@@ -427,6 +450,27 @@ export class AppComponent {
   ontextChangeGuardEdge() {
     var j = this.cy.$('#' + this.selectedEdge);
     j.data('guard', this.edgeGuard);
+  }
+
+  ontextChangeRequirementNode() {
+    var j = this.cy.$('#' + this.selectedNode);
+    j.data('requirement', this.nodeRequirements);
+  }
+
+  ontextChangeRequirementEdge() {
+    var j = this.cy.$('#' + this.selectedEdge);
+    j.data('requirement', this.edgeRequirements);
+  }
+
+
+  ontextChangeWeightNode() {
+    var j = this.cy.$('#' + this.selectedNode);
+    j.data('weight', this.nodeWeight);
+  }
+
+  ontextChangeWeightEdge() {
+    var j = this.cy.$('#' + this.selectedEdge);
+    j.data('weight', this.edgeWeight);
   }
 
   getData() {
@@ -487,15 +531,26 @@ export class AppComponent {
         });
         var j = cySec.$('#'+nodeId);
         var edge = j.connectedEdges();
-        if(ele.id() === edge[0].target().id()) {
-          cySec.$('#' + edge[0].id()).css({
-            "target-arrow-color": "rgb(0,0,255)",
-            "line-color": "rgb(0,0,255)",
-            "source-arrow-color": "rgb(0,0,255)",
-          });
-        }
-        // console.log('Node source ', ele.id(), edge[0].source().id(), edge[0].id());
-        // console.log('Node target ', ele.id(), edge[0].target().id(), edge[0].id());
+        cySec.edges().forEach(function (edgeSec) {
+          if(edgeSec[0].source().id() === ele.id()) {
+            cySec.$('#' + edgeSec.id()).css({
+              "target-arrow-color": "rgb(0,0,255)",
+              "line-color": "rgb(0,0,255)",
+              "source-arrow-color": "rgb(0,0,255)",
+            });
+          }
+          // console.log(edgeSec[0].source().id())
+        })
+
+        // if(ele.id() === edge[0].target().id()) {
+        //   cySec.$('#' + edge[0].id()).css({
+        //     "target-arrow-color": "rgb(0,0,255)",
+        //     "line-color": "rgb(0,0,255)",
+        //     "source-arrow-color": "rgb(0,0,255)",
+        //   });
+        // }
+        console.log('Node source ', ele.id(), edge[0].source().id(), edge[0].id());
+        console.log('Node target ', ele.id(), edge[0].target().id(), edge[0].id());
       }, i * 1000);
      
     });
@@ -516,15 +571,33 @@ export class AppComponent {
         backgroundColor: 'white'
       });
     });
+
+    cySec.edges().forEach(function (edgeSec) {
+      cySec.$('#' + edgeSec.id()).css({
+        "target-arrow-color": "rgb(132,132,132)",
+        "line-color": "rgb(132,132,132)",
+        "source-arrow-color": "rgb(132,132,132)",
+      });
+    })
+
   }
 
+  addInput(x: number, y: number) {
+      var inputSec:any = document.getElementById('tooltipArea');
+      inputSec.style.display = 'block'
+      inputSec.style.left = (x + 215) + 'px';
+      inputSec.style.top = (y - 90) + 'px';
+  }
 
-  @HostListener('window:keydown.shift', ['$event'])
+  @HostListener('window:keydown.control', ['$event'])
   onKeyPress($event: KeyboardEvent) {
-    this.drawModeOn()
+    if(this.drawMode === 'Off') {
+      this.drawModeOn()
+    }
   }
-  @HostListener('window:keydown.shift', ['$event'])
+  @HostListener('window:keyup.control', ['$event'])
   onKeyUp($event: KeyboardEvent) {
     this.drawModeOff()
   }
+
 }
